@@ -1,0 +1,15 @@
+{
+    "atomType": "Molecule",
+    "name": "Move-rotate-iteration",
+    "x": 0,
+    "y": 0,
+    "uniqueID": "2969f0cf-de32-4244-a816-4807f70d89fe",
+    "ioValues": [],
+    "topLevel": true,
+    "allAtoms": [],
+    "allConnectors": [],
+    "unitsKey": "Unitless",
+    "fileTypeVersion": 1,
+    "compiledBom": {},
+    "filetypeVersion": 1
+}
