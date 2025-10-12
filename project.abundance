@@ -51,8 +51,8 @@
     {
       "atomType": "Code",
       "name": "Code",
-      "x": 0.6503322259136213,
-      "y": 0.6739130434782609,
+      "x": 0.622093023255814,
+      "y": 0.6366459627329192,
       "uniqueID": "f04ce2c6-debd-40cb-90ef-c3862b6f985c",
       "ioValues": [
         {
@@ -89,7 +89,7 @@
         }
       ],
       "codeVersion": 1,
-      "code": "// Code Atom: create an assembly of repeated instances of an imported shape\n// Inputs (these become variables available to the atom runtime):\nconst Inputs = [\n  { inputName: \"shape\", type: \"geometry\", defaultValue: null },\n  { inputName: \"count\", type: \"number\", defaultValue: 6 },\n  { inputName: \"rotateX\", type: \"number\", defaultValue: 0 },\n  { inputName: \"rotateY\", type: \"number\", defaultValue: 60 },\n  { inputName: \"rotateZ\", type: \"number\", defaultValue: 0 },\n  { inputName: \"moveX\", type: \"number\", defaultValue: 5 },\n  { inputName: \"moveY\", type: \"number\", defaultValue: 0 },\n  { inputName: \"moveZ\", type: \"number\", defaultValue: 0 },\n  { inputName: \"cumulative\", type: \"boolean\", defaultValue: true }\n]\n\n// Implementation:\n// - library[shape] gives the imported geometry\n// - If cumulative==true the transform is applied to the last instance each iteration\n// - If cumulative==false each instance is transform = base rotated/moved by (i * delta)\nlet base = library[shape]\nif (!base) throw new Error(\"No shape found in library for the provided 'shape' input\")\n\n// clamp count to at least 1\nlet n = Math.max(1, Math.floor(count))\n\nlet instances = []\n\nif (cumulative) {\n  // Start with the base as the first instance\n  let current = base\n  instances.push(current)\n  for (let i = 1; i < n; i++) {\n    // rotate then move (order can be swapped if desired)\n    current = await Rotate(current, rotateX, rotateY, rotateZ)\n    current = await Move(current, moveX, moveY, moveZ)\n    instances.push(current)\n  }\n} else {\n  // Non-cumulative: each instance is the base transformed by i * (delta)\n  for (let i = 0; i < n; i++) {\n    let rX = rotateX * i\n    let rY = rotateY * i\n    let rZ = rotateZ * i\n    let mX = moveX * i\n    let mY = moveY * i\n    let mZ = moveZ * i\n\n    let rotated = await Rotate(base, rX, rY, rZ)\n    let moved = await Move(rotated, mX, mY, mZ)\n    instances.push(moved)\n  }\n}\n\n// Combine all instances into a single assembly and return\nlet finalAssembly = await Assembly(instances)\nreturn finalAssembly"
+      "code": "// Code Atom: create an assembly of repeated instances of an imported shape\n// Inputs (these become variables available to the atom runtime):\nconst Inputs = [\n  { inputName: \"shape\", type: \"geometry\", defaultValue: null },\n  { inputName: \"count\", type: \"number\", defaultValue: 6 },\n  { inputName: \"rotateX\", type: \"number\", defaultValue: 0 },\n  { inputName: \"rotateY\", type: \"number\", defaultValue: 60 },\n  { inputName: \"rotateZ\", type: \"number\", defaultValue: 0 },\n  { inputName: \"moveX\", type: \"number\", defaultValue: 5 },\n  { inputName: \"moveY\", type: \"number\", defaultValue: 0 },\n  { inputName: \"moveZ\", type: \"number\", defaultValue: 0 },\n // { inputName: \"cumulative\", type: \"boolean\", defaultValue: true }\n]\n\n// Implementation:\n// - library[shape] gives the imported geometry\n// - If cumulative==true the transform is applied to the last instance each iteration\n// - If cumulative==false each instance is transform = base rotated/moved by (i * delta)\nlet base = library[shape]\nif (!base) throw new Error(\"No shape found in library for the provided 'shape' input\")\n\n// clamp count to at least 1\nlet n = Math.max(1, Math.floor(count))\n\nlet instances = []\n\nif (cumulative) {\n  // Start with the base as the first instance\n  let current = base\n  instances.push(current)\n  for (let i = 1; i < n; i++) {\n    // rotate then move (order can be swapped if desired)\n    current = await Rotate(current, rotateX, rotateY, rotateZ)\n    current = await Move(current, moveX, moveY, moveZ)\n    instances.push(current)\n  }\n} else {\n  // Non-cumulative: each instance is the base transformed by i * (delta)\n  for (let i = 0; i < n; i++) {\n    let rX = rotateX * i\n    let rY = rotateY * i\n    let rZ = rotateZ * i\n    let mX = moveX * i\n    let mY = moveY * i\n    let mZ = moveZ * i\n\n    let rotated = await Rotate(base, rX, rY, rZ)\n    let moved = await Move(rotated, mX, mY, mZ)\n    instances.push(moved)\n  }\n}\n\n// Combine all instances into a single assembly and return\nlet finalAssembly = await Assembly(instances)\nreturn finalAssembly"
     },
     {
       "atomType": "Extrude",
@@ -125,7 +125,7 @@
       "atomType": "Input",
       "name": "Shape",
       "x": 0.04455,
-      "y": 0.2950310559006211,
+      "y": 0.49689440993788814,
       "uniqueID": "1b51d204-a4a9-4d65-8b26-866fbd9671c2",
       "ioValues": [],
       "type": "geometry"
@@ -134,7 +134,7 @@
       "atomType": "Input",
       "name": "movex",
       "x": 0.04455,
-      "y": 0.7732919254658385,
+      "y": 0.8198757763975155,
       "uniqueID": "8d8dc44a-e7f8-42d1-889d-dbb6c149b3a5",
       "ioValues": [],
       "type": "number"
@@ -143,7 +143,7 @@
       "atomType": "Input",
       "name": "movey",
       "x": 0.04455,
-      "y": 0.3074534161490683,
+      "y": 0.19254658385093168,
       "uniqueID": "334667a1-5520-409a-91a0-27bec010cf37",
       "ioValues": [],
       "type": "number"
@@ -152,7 +152,7 @@
       "atomType": "Input",
       "name": "movez",
       "x": 0.04455,
-      "y": 0.531055900621118,
+      "y": 0.34782608695652173,
       "uniqueID": "980831a8-c2df-424b-8c22-b3b683a79ea8",
       "ioValues": [],
       "type": "number"
@@ -161,7 +161,7 @@
       "atomType": "Input",
       "name": "rotatey",
       "x": 0.04455,
-      "y": 0.6428571428571428,
+      "y": 0.48136645962732916,
       "uniqueID": "d78da9b6-0b56-456d-a574-d35ddf013362",
       "ioValues": [],
       "type": "number"
@@ -170,7 +170,7 @@
       "atomType": "Input",
       "name": "rotatex",
       "x": 0.04455,
-      "y": 0.7298136645962733,
+      "y": 0.7329192546583851,
       "uniqueID": "344d0a50-649d-4f64-86ca-528e78954b16",
       "ioValues": [],
       "type": "number"
@@ -179,7 +179,7 @@
       "atomType": "Input",
       "name": "rotatez",
       "x": 0.04455,
-      "y": 0.5993788819875777,
+      "y": 0.65527950310559,
       "uniqueID": "8fcd46df-4a4c-41f4-8487-0fb84fbf6e56",
       "ioValues": [],
       "type": "number"
@@ -222,6 +222,12 @@
     {
       "ap1Name": "number or geometry",
       "ap2Name": "moveY",
+      "ap1ID": "334667a1-5520-409a-91a0-27bec010cf37",
+      "ap2ID": "f04ce2c6-debd-40cb-90ef-c3862b6f985c"
+    },
+    {
+      "ap1Name": "number or geometry",
+      "ap2Name": "moveZ",
       "ap1ID": "980831a8-c2df-424b-8c22-b3b683a79ea8",
       "ap2ID": "f04ce2c6-debd-40cb-90ef-c3862b6f985c"
     },
