@@ -4,7 +4,20 @@
   "x": 0,
   "y": 0,
   "uniqueID": "2969f0cf-de32-4244-a816-4807f70d89fe",
-  "ioValues": [],
+  "ioValues": [
+    {
+      "name": "Shape",
+      "ioValue": 10
+    },
+    {
+      "name": "movex",
+      "ioValue": 10
+    },
+    {
+      "name": "movey",
+      "ioValue": 10
+    }
+  ],
   "topLevel": true,
   "allAtoms": [
     {
@@ -18,9 +31,111 @@
     {
       "atomType": "Code",
       "name": "Code",
-      "x": 0.4833887043189368,
-      "y": 0.5900621118012422,
+      "x": 0.5191029900332226,
+      "y": 0.4782608695652174,
       "uniqueID": "f04ce2c6-debd-40cb-90ef-c3862b6f985c",
+      "ioValues": [
+        {
+          "name": "count",
+          "ioValue": 7,
+          "currentEquation": "7"
+        },
+        {
+          "name": "rotateX",
+          "ioValue": 0,
+          "currentEquation": "0"
+        },
+        {
+          "name": "rotateY",
+          "ioValue": 0,
+          "currentEquation": "0"
+        },
+        {
+          "name": "rotateZ",
+          "ioValue": 10,
+          "currentEquation": "10"
+        },
+        {
+          "name": "moveX",
+          "ioValue": 15,
+          "currentEquation": "15"
+        },
+        {
+          "name": "moveY",
+          "ioValue": 0
+        },
+        {
+          "name": "moveZ",
+          "ioValue": 0
+        }
+      ],
+      "codeVersion": 1,
+      "code": "// Code Atom: create an assembly of repeated instances of an imported shape\n// Inputs (these become variables available to the atom runtime):\nconst Inputs = [\n  { inputName: \"shape\", type: \"geometry\", defaultValue: null },\n  { inputName: \"count\", type: \"number\", defaultValue: 6 },\n  { inputName: \"rotateX\", type: \"number\", defaultValue: 0 },\n  { inputName: \"rotateY\", type: \"number\", defaultValue: 60 },\n  { inputName: \"rotateZ\", type: \"number\", defaultValue: 0 },\n  { inputName: \"moveX\", type: \"number\", defaultValue: 5 },\n  { inputName: \"moveY\", type: \"number\", defaultValue: 0 },\n  { inputName: \"moveZ\", type: \"number\", defaultValue: 0 },\n  { inputName: \"cumulative\", type: \"boolean\", defaultValue: true }\n]\n\n// Implementation:\n// - library[shape] gives the imported geometry\n// - If cumulative==true the transform is applied to the last instance each iteration\n// - If cumulative==false each instance is transform = base rotated/moved by (i * delta)\nlet base = library[shape]\nif (!base) throw new Error(\"No shape found in library for the provided 'shape' input\")\n\n// clamp count to at least 1\nlet n = Math.max(1, Math.floor(count))\n\nlet instances = []\n\nif (cumulative) {\n  // Start with the base as the first instance\n  let current = base\n  instances.push(current)\n  for (let i = 1; i < n; i++) {\n    // rotate then move (order can be swapped if desired)\n    current = await Rotate(current, rotateX, rotateY, rotateZ)\n    current = await Move(current, moveX, moveY, moveZ)\n    instances.push(current)\n  }\n} else {\n  // Non-cumulative: each instance is the base transformed by i * (delta)\n  for (let i = 0; i < n; i++) {\n    let rX = rotateX * i\n    let rY = rotateY * i\n    let rZ = rotateZ * i\n    let mX = moveX * i\n    let mY = moveY * i\n    let mZ = moveZ * i\n\n    let rotated = await Rotate(base, rX, rY, rZ)\n    let moved = await Move(rotated, mX, mY, mZ)\n    instances.push(moved)\n  }\n}\n\n// Combine all instances into a single assembly and return\nlet finalAssembly = await Assembly(instances)\nreturn finalAssembly"
+    },
+    {
+      "atomType": "Extrude",
+      "name": "Extrude",
+      "x": 0.3961794019933555,
+      "y": 0.30434782608695654,
+      "uniqueID": "9194d814-ec06-40b3-b157-2d166d2ca0ab",
+      "ioValues": [
+        {
+          "name": "height",
+          "ioValue": 12,
+          "currentEquation": "12"
+        }
+      ]
+    },
+    {
+      "atomType": "Rectangle",
+      "name": "Rectangle",
+      "x": 0.26245847176079734,
+      "y": 0.2080745341614907,
+      "uniqueID": "da429dba-afb2-411a-b6db-98455611454e",
+      "ioValues": [
+        {
+          "name": "x length",
+          "ioValue": 10
+        },
+        {
+          "name": "y length",
+          "ioValue": 10
+        }
+      ]
+    },
+    {
+      "atomType": "Input",
+      "name": "Shape",
+      "x": 0.025384615384615384,
+      "y": 0.2795031055900621,
+      "uniqueID": "1b51d204-a4a9-4d65-8b26-866fbd9671c2",
+      "ioValues": [],
+      "type": "number"
+    },
+    {
+      "atomType": "Input",
+      "name": "movex",
+      "x": 0.025384615384615384,
+      "y": 0.38509316770186336,
+      "uniqueID": "8d8dc44a-e7f8-42d1-889d-dbb6c149b3a5",
+      "ioValues": [],
+      "type": "number"
+    },
+    {
+      "atomType": "Input",
+      "name": "movey",
+      "x": 0.025384615384615384,
+      "y": 0.5,
+      "uniqueID": "334667a1-5520-409a-91a0-27bec010cf37",
+      "ioValues": [],
+      "type": "number"
+    },
+    {
+      "atomType": "Code",
+      "name": "Code",
+      "x": 0.4767441860465116,
+      "y": 0.639751552795031,
+      "uniqueID": "cae63948-7b1e-4522-aac0-6dec0e0e218d",
       "ioValues": [
         {
           "name": "dist",
@@ -35,9 +150,28 @@
       "code": "\n      const Inputs = [\n       {inputName: \"shape\", type: \"geometry\", defaultValue: null},\n      {inputName: \"dist\", type: \"number\", defaultValue: 5},\n        {inputName: \"height\", type: \"number\", defaultValue: 10}\n      ]\n      //This defines the molecules inputs and creates variables with the same names which can be referenced in the code\n\n      //Gets the shape from the library - no need to clone or access geometry directly\n      let importedShape = library[shape]\n\n      //Use the built-in Move function to move the shape in the X direction\n      let movedShape = await Move(importedShape, dist, 0, 0)\n\n      //Use the built-in Rotate function to rotate the shape\n      let rotatedShape = await Rotate(importedShape, 0, 45, 0)\n\n      //Use the built-in Scale function to make the shape smaller\n      let scaledShape = await Scale(importedShape, 0.8)\n\n      //Console.log works for debugging to better see what is happening under the hood\n      console.log(\"Original shape bounds:\", GetBounds(importedShape))\n      console.log(\"Moved shape bounds:\", GetBounds(movedShape))\n\n      //Create a new shape from scratch using replicad\n      let createdRectangle = replicad.drawRectangle(5, 7)\n      const newPlane = new replicad.Plane().pivot(0, 'Y')\n      let createdShape = createdRectangle.sketchOnPlane(newPlane).extrude(height)\n\n      //Wrap the raw replicad geometry in our assembly format\n      let shape2 = {\n          geometry: [createdShape],\n          dimension: \"3D\",\n          tags: [\"createdShape\"],\n          color: '#A3CE5B',\n          plane: newPlane,\n          bom: []\n      }\n\n      //Use the built-in Fillet function to round the edges\n      let filletedShape = await Fillet(shape2, 0.5)\n\n      //Use the built-in Chamfer function to bevel the edges  \n      let chamferedShape = await Chamfer(movedShape, 0.3)\n\n      //Use the built-in Assembly function to combine multiple shapes\n      let finalAssembly = await Assembly([rotatedShape, scaledShape, filletedShape, chamferedShape])\n\n      //You can also create boolean operations using Intersect\n      //let intersection = await Intersect(movedShape, rotatedShape)\n\n      return finalAssembly\n\n      /**\n      Built-in Functions Available:\n      - Move(geometry, x, y, z) - Move a shape in 3D space\n      - Rotate(geometry, x, y, z) - Rotate a shape around X, Y, Z axes (degrees)\n      - Scale(geometry, factor) - Scale a shape by a factor\n      - Assembly([shapes]) - Combine multiple shapes into an assembly\n      - Intersect(shape1, shape2) - Boolean intersection of two shapes\n      - GetBounds(geometry) - Get the bounding box of a shape\n      - Fillet(geometry, radius) - Round edges with specified radius\n      - Chamfer(geometry, size) - Bevel edges with specified size\n\n      To Use the Code Atom, enter your inputs to the input list as an object array:\n      const Inputs = [\n        {inputName: \"shape\", type: \"geometry\", defaultValue: null},\n        {inputName: \"dist\", type: \"number\", defaultValue: 5},\n        {inputName: \"height\", type: \"number\", defaultValue: 10}\n      ]\n\n      Access imported geometry using library[inputName] - the built-in functions handle \n      the complexity of accessing geometry arrays and maintaining metadata automatically.\n\n      Simple Example - Move a shape:\n         const Inputs = [\n          {inputName: \"shape\", type: \"geometry\", defaultValue: null},\n          {inputName: \"x\", type: \"number\", defaultValue: 5}\n        ]\n        let movedShape = await Move(library[shape], x, 0, 0)\n        return movedShape\n      */\n      "
     }
   ],
-  "allConnectors": [],
+  "allConnectors": [
+    {
+      "ap1Name": "output",
+      "ap2Name": "number or geometry",
+      "ap1ID": "f04ce2c6-debd-40cb-90ef-c3862b6f985c",
+      "ap2ID": "9f46754f-73f9-495c-a7ac-f0d3557322fb"
+    },
+    {
+      "ap1Name": "geometry",
+      "ap2Name": "shape",
+      "ap1ID": "9194d814-ec06-40b3-b157-2d166d2ca0ab",
+      "ap2ID": "f04ce2c6-debd-40cb-90ef-c3862b6f985c"
+    },
+    {
+      "ap1Name": "geometry",
+      "ap2Name": "geometry",
+      "ap1ID": "da429dba-afb2-411a-b6db-98455611454e",
+      "ap2ID": "9194d814-ec06-40b3-b157-2d166d2ca0ab"
+    }
+  ],
   "unitsKey": "Unitless",
   "fileTypeVersion": 1,
-  "compiledBom": {},
+  "compiledBom": [],
   "filetypeVersion": 1
 }
