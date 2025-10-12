@@ -11,11 +11,37 @@
     },
     {
       "name": "movex",
-      "ioValue": 10
+      "ioValue": 5,
+      "currentEquation": "5"
     },
     {
       "name": "movey",
+      "ioValue": 0,
+      "currentEquation": "0"
+    },
+    {
+      "name": "movez",
+      "ioValue": 0,
+      "currentEquation": "0"
+    },
+    {
+      "name": "rotatex",
       "ioValue": 10
+    },
+    {
+      "name": "rotatex",
+      "ioValue": 0,
+      "currentEquation": "0"
+    },
+    {
+      "name": "rotatez",
+      "ioValue": 0,
+      "currentEquation": "0"
+    },
+    {
+      "name": "count",
+      "ioValue": 3,
+      "currentEquation": "3"
     }
   ],
   "topLevel": true,
@@ -31,13 +57,17 @@
     {
       "atomType": "Code",
       "name": "Code",
-      "x": 0.5191029900332226,
-      "y": 0.4782608695652174,
+      "x": 0.45681063122923593,
+      "y": 0.6459627329192547,
       "uniqueID": "f04ce2c6-debd-40cb-90ef-c3862b6f985c",
       "ioValues": [
         {
+          "name": "shape",
+          "ioValue": 10
+        },
+        {
           "name": "count",
-          "ioValue": 7,
+          "ioValue": 3,
           "currentEquation": "7"
         },
         {
@@ -52,12 +82,12 @@
         },
         {
           "name": "rotateZ",
-          "ioValue": 10,
+          "ioValue": 0,
           "currentEquation": "10"
         },
         {
           "name": "moveX",
-          "ioValue": 15,
+          "ioValue": 0,
           "currentEquation": "15"
         },
         {
@@ -107,10 +137,10 @@
       "atomType": "Input",
       "name": "Shape",
       "x": 0.025384615384615384,
-      "y": 0.2795031055900621,
+      "y": 0.2950310559006211,
       "uniqueID": "1b51d204-a4a9-4d65-8b26-866fbd9671c2",
       "ioValues": [],
-      "type": "number"
+      "type": "geometry"
     },
     {
       "atomType": "Input",
@@ -131,23 +161,49 @@
       "type": "number"
     },
     {
-      "atomType": "Code",
-      "name": "Code",
-      "x": 0.4767441860465116,
-      "y": 0.639751552795031,
-      "uniqueID": "cae63948-7b1e-4522-aac0-6dec0e0e218d",
-      "ioValues": [
-        {
-          "name": "dist",
-          "ioValue": 5
-        },
-        {
-          "name": "height",
-          "ioValue": 10
-        }
-      ],
-      "codeVersion": 1,
-      "code": "\n      const Inputs = [\n       {inputName: \"shape\", type: \"geometry\", defaultValue: null},\n      {inputName: \"dist\", type: \"number\", defaultValue: 5},\n        {inputName: \"height\", type: \"number\", defaultValue: 10}\n      ]\n      //This defines the molecules inputs and creates variables with the same names which can be referenced in the code\n\n      //Gets the shape from the library - no need to clone or access geometry directly\n      let importedShape = library[shape]\n\n      //Use the built-in Move function to move the shape in the X direction\n      let movedShape = await Move(importedShape, dist, 0, 0)\n\n      //Use the built-in Rotate function to rotate the shape\n      let rotatedShape = await Rotate(importedShape, 0, 45, 0)\n\n      //Use the built-in Scale function to make the shape smaller\n      let scaledShape = await Scale(importedShape, 0.8)\n\n      //Console.log works for debugging to better see what is happening under the hood\n      console.log(\"Original shape bounds:\", GetBounds(importedShape))\n      console.log(\"Moved shape bounds:\", GetBounds(movedShape))\n\n      //Create a new shape from scratch using replicad\n      let createdRectangle = replicad.drawRectangle(5, 7)\n      const newPlane = new replicad.Plane().pivot(0, 'Y')\n      let createdShape = createdRectangle.sketchOnPlane(newPlane).extrude(height)\n\n      //Wrap the raw replicad geometry in our assembly format\n      let shape2 = {\n          geometry: [createdShape],\n          dimension: \"3D\",\n          tags: [\"createdShape\"],\n          color: '#A3CE5B',\n          plane: newPlane,\n          bom: []\n      }\n\n      //Use the built-in Fillet function to round the edges\n      let filletedShape = await Fillet(shape2, 0.5)\n\n      //Use the built-in Chamfer function to bevel the edges  \n      let chamferedShape = await Chamfer(movedShape, 0.3)\n\n      //Use the built-in Assembly function to combine multiple shapes\n      let finalAssembly = await Assembly([rotatedShape, scaledShape, filletedShape, chamferedShape])\n\n      //You can also create boolean operations using Intersect\n      //let intersection = await Intersect(movedShape, rotatedShape)\n\n      return finalAssembly\n\n      /**\n      Built-in Functions Available:\n      - Move(geometry, x, y, z) - Move a shape in 3D space\n      - Rotate(geometry, x, y, z) - Rotate a shape around X, Y, Z axes (degrees)\n      - Scale(geometry, factor) - Scale a shape by a factor\n      - Assembly([shapes]) - Combine multiple shapes into an assembly\n      - Intersect(shape1, shape2) - Boolean intersection of two shapes\n      - GetBounds(geometry) - Get the bounding box of a shape\n      - Fillet(geometry, radius) - Round edges with specified radius\n      - Chamfer(geometry, size) - Bevel edges with specified size\n\n      To Use the Code Atom, enter your inputs to the input list as an object array:\n      const Inputs = [\n        {inputName: \"shape\", type: \"geometry\", defaultValue: null},\n        {inputName: \"dist\", type: \"number\", defaultValue: 5},\n        {inputName: \"height\", type: \"number\", defaultValue: 10}\n      ]\n\n      Access imported geometry using library[inputName] - the built-in functions handle \n      the complexity of accessing geometry arrays and maintaining metadata automatically.\n\n      Simple Example - Move a shape:\n         const Inputs = [\n          {inputName: \"shape\", type: \"geometry\", defaultValue: null},\n          {inputName: \"x\", type: \"number\", defaultValue: 5}\n        ]\n        let movedShape = await Move(library[shape], x, 0, 0)\n        return movedShape\n      */\n      "
+      "atomType": "Input",
+      "name": "movez",
+      "x": 0.025384615384615384,
+      "y": 0.5931677018633541,
+      "uniqueID": "980831a8-c2df-424b-8c22-b3b683a79ea8",
+      "ioValues": [],
+      "type": "number"
+    },
+    {
+      "atomType": "Input",
+      "name": "rotatey",
+      "x": 0.025384615384615384,
+      "y": 0.6863354037267081,
+      "uniqueID": "d78da9b6-0b56-456d-a574-d35ddf013362",
+      "ioValues": [],
+      "type": "number"
+    },
+    {
+      "atomType": "Input",
+      "name": "rotatex",
+      "x": 0.025384615384615384,
+      "y": 0.8167701863354037,
+      "uniqueID": "344d0a50-649d-4f64-86ca-528e78954b16",
+      "ioValues": [],
+      "type": "number"
+    },
+    {
+      "atomType": "Input",
+      "name": "rotatez",
+      "x": 0.025384615384615384,
+      "y": 0.9285714285714286,
+      "uniqueID": "8fcd46df-4a4c-41f4-8487-0fb84fbf6e56",
+      "ioValues": [],
+      "type": "number"
+    },
+    {
+      "atomType": "Input",
+      "name": "count",
+      "x": 0.025384615384615384,
+      "y": 0.2204968944099379,
+      "uniqueID": "9130a57a-13f7-4bf7-91da-24c9f19078e6",
+      "ioValues": [],
+      "type": "number"
     }
   ],
   "allConnectors": [
@@ -159,15 +215,45 @@
     },
     {
       "ap1Name": "geometry",
-      "ap2Name": "shape",
-      "ap1ID": "9194d814-ec06-40b3-b157-2d166d2ca0ab",
-      "ap2ID": "f04ce2c6-debd-40cb-90ef-c3862b6f985c"
-    },
-    {
-      "ap1Name": "geometry",
       "ap2Name": "geometry",
       "ap1ID": "da429dba-afb2-411a-b6db-98455611454e",
       "ap2ID": "9194d814-ec06-40b3-b157-2d166d2ca0ab"
+    },
+    {
+      "ap1Name": "number or geometry",
+      "ap2Name": "shape",
+      "ap1ID": "1b51d204-a4a9-4d65-8b26-866fbd9671c2",
+      "ap2ID": "f04ce2c6-debd-40cb-90ef-c3862b6f985c"
+    },
+    {
+      "ap1Name": "number or geometry",
+      "ap2Name": "moveX",
+      "ap1ID": "334667a1-5520-409a-91a0-27bec010cf37",
+      "ap2ID": "f04ce2c6-debd-40cb-90ef-c3862b6f985c"
+    },
+    {
+      "ap1Name": "number or geometry",
+      "ap2Name": "moveY",
+      "ap1ID": "980831a8-c2df-424b-8c22-b3b683a79ea8",
+      "ap2ID": "f04ce2c6-debd-40cb-90ef-c3862b6f985c"
+    },
+    {
+      "ap1Name": "number or geometry",
+      "ap2Name": "rotateX",
+      "ap1ID": "344d0a50-649d-4f64-86ca-528e78954b16",
+      "ap2ID": "f04ce2c6-debd-40cb-90ef-c3862b6f985c"
+    },
+    {
+      "ap1Name": "number or geometry",
+      "ap2Name": "rotateZ",
+      "ap1ID": "8fcd46df-4a4c-41f4-8487-0fb84fbf6e56",
+      "ap2ID": "f04ce2c6-debd-40cb-90ef-c3862b6f985c"
+    },
+    {
+      "ap1Name": "number or geometry",
+      "ap2Name": "count",
+      "ap1ID": "9130a57a-13f7-4bf7-91da-24c9f19078e6",
+      "ap2ID": "f04ce2c6-debd-40cb-90ef-c3862b6f985c"
     }
   ],
   "unitsKey": "Unitless",
