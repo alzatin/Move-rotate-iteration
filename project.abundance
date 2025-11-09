@@ -51,8 +51,8 @@
     {
       "atomType": "Code",
       "name": "Code",
-      "x": 0.6230248306997742,
-      "y": 0.577639751552795,
+      "x": 0.62227602905569,
+      "y": 0.5496894409937888,
       "uniqueID": "f04ce2c6-debd-40cb-90ef-c3862b6f985c",
       "ioValues": [
         {
@@ -94,8 +94,8 @@
     {
       "atomType": "Extrude",
       "name": "Extrude",
-      "x": 0.3906040268456376,
-      "y": 0.3416149068322981,
+      "x": 0.47538337368845845,
+      "y": 0.24223602484472048,
       "uniqueID": "9194d814-ec06-40b3-b157-2d166d2ca0ab",
       "ioValues": [
         {
@@ -192,6 +192,55 @@
       "uniqueID": "9130a57a-13f7-4bf7-91da-24c9f19078e6",
       "ioValues": [],
       "type": "number"
+    },
+    {
+      "atomType": "Code",
+      "name": "Code",
+      "x": 0.6020984665052461,
+      "y": 0.3167701863354037,
+      "uniqueID": "id-36",
+      "ioValues": [
+        {
+          "name": "count",
+          "ioValue": 3
+        },
+        {
+          "name": "rotateX",
+          "ioValue": 0
+        },
+        {
+          "name": "rotateY",
+          "ioValue": 0
+        },
+        {
+          "name": "rotateZ",
+          "ioValue": 0
+        },
+        {
+          "name": "moveX",
+          "ioValue": 5
+        },
+        {
+          "name": "moveY",
+          "ioValue": 10
+        },
+        {
+          "name": "moveZ",
+          "ioValue": 0
+        }
+      ],
+      "codeVersion": 1,
+      "code": "// Code Atom: create an assembly of repeated instances of an imported shape\n// Inputs (these become variables available to the atom runtime):\nconst Inputs = [\n  { inputName: \"shape\", type: \"geometry\", defaultValue: null },\n  { inputName: \"count\", type: \"number\", defaultValue: 6 },\n  { inputName: \"rotateX\", type: \"number\", defaultValue: 0 },\n  { inputName: \"rotateY\", type: \"number\", defaultValue: 60 },\n  { inputName: \"rotateZ\", type: \"number\", defaultValue: 0 },\n  { inputName: \"moveX\", type: \"number\", defaultValue: 5 },\n  { inputName: \"moveY\", type: \"number\", defaultValue: 0 },\n  { inputName: \"moveZ\", type: \"number\", defaultValue: 0 },\n // { inputName: \"cumulative\", type: \"boolean\", defaultValue: true }\n]\nlet cumulative = true;\n// Implementation:\n// - library[shape] gives the imported geometry\n// - If cumulative==true the transform is applied to the last instance each iteration\n// - If cumulative==false each instance is transform = base rotated/moved by (i * delta)\nlet base = library[shape]\nif (!base) throw new Error(\"No shape found in library for the provided 'shape' input\")\n\n// clamp count to at least 1\nlet n = Math.max(1, Math.floor(count))\n\nlet instances = []\n\nif (cumulative) {\n  // Start with the base as the first instance\n  let current = base\n  instances.push(current)\n  for (let i = 1; i < n; i++) {\n    // rotate then move (order can be swapped if desired)\n    current = await Rotate(current, rotateX, rotateY, rotateZ)\n    current = await Move(current, moveX, moveY, moveZ)\n    instances.push(current)\n  }\n} else {\n  // Non-cumulative: each instance is the base transformed by i * (delta)\n  for (let i = 0; i < n; i++) {\n    let rX = rotateX * i\n    let rY = rotateY * i\n    let rZ = rotateZ * i\n    let mX = moveX * i\n    let mY = moveY * i\n    let mZ = moveZ * i\n\n    let rotated = await Rotate(base, rX, rY, rZ)\n    let moved = await Move(rotated, mX, mY, mZ)\n    instances.push(moved)\n  }\n}\n\n// Combine all instances into a single assembly and return\nlet finalAssembly = await Assembly(instances)\nconsole.log(finalAssembly)\nreturn finalAssembly"
+    },
+    {
+      "atomType": "Readme",
+      "name": "README",
+      "x": 0.7586763518966908,
+      "y": 0.4347826086956522,
+      "uniqueID": "id-46",
+      "ioValues": [],
+      "readMeText": "Readme text here",
+      "global": true
     }
   ],
   "allConnectors": [
@@ -200,6 +249,12 @@
       "ap2Name": "number or geometry",
       "ap1ID": "f04ce2c6-debd-40cb-90ef-c3862b6f985c",
       "ap2ID": "9f46754f-73f9-495c-a7ac-f0d3557322fb"
+    },
+    {
+      "ap1Name": "geometry",
+      "ap2Name": "shape",
+      "ap1ID": "9194d814-ec06-40b3-b157-2d166d2ca0ab",
+      "ap2ID": "id-36"
     },
     {
       "ap1Name": "geometry",
@@ -254,6 +309,12 @@
       "ap2Name": "count",
       "ap1ID": "9130a57a-13f7-4bf7-91da-24c9f19078e6",
       "ap2ID": "f04ce2c6-debd-40cb-90ef-c3862b6f985c"
+    },
+    {
+      "ap1Name": "output",
+      "ap2Name": "geometry",
+      "ap1ID": "id-36",
+      "ap2ID": "id-46"
     }
   ],
   "unitsKey": "Unitless",
